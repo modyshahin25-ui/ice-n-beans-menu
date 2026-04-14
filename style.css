@@ -1,0 +1,68 @@
+/* تنسيق عام للصفحة */
+body {
+    background-color: #1a1a1a; /* لون أسود شيك */
+    color: #f1f1f1; /* لون الخط أبيض هادي */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* الهيدر (اسم الكافيه) */
+.menu-header {
+    background-color: #000;
+    text-align: center;
+    padding: 30px;
+    border-bottom: 2px solid #d4af37; /* خط ذهبي */
+}
+
+h1 { color: #d4af37; letter-spacing: 2px; }
+
+/* حاوية المنيو */
+.container {
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+/* شكل القسم (مثلاً المشروبات الساخنة) */
+.menu-section {
+    margin-bottom: 30px;
+}
+
+.menu-section h2 {
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+    color: #d4af37;
+}
+
+/* تنسيق الصنف والسعر */
+.item {
+    display: flex;
+    justify-content: space-between; /* يخلي الاسم يمين والسعر شمال */
+    padding: 10px 0;
+    border-bottom: 1px dashed #333;
+}
+
+/* السوشيال ميديا */
+.social-media {
+    text-align: center;
+    margin-top: 40px;
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.links a {
+    color: #d4af37;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1.2rem;
+}
+
+/* معلومات التواصل */
+.contact-info {
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 20px;
+    color: #888;
+}
