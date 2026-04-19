@@ -3,47 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم Ice N Beans</title>
+    <title>لوحة التحكم - Ice N Beans</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
-        button { background-color: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-size: 16px; }
-        button:hover { background-color: #218838; }
-        .admin-item { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; text-align: right; }
-        .delete-btn { background-color: #dc3545; padding: 5px 10px; font-size: 14px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f7f7f7; padding: 20px; direction: rtl; text-align: center; }
+        .box { max-width: 550px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .setup-btn { background: #6c757d; margin-bottom: 20px; }
+        .admin-item { background: #fff; border: 1px solid #eee; padding: 12px; margin-top: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { background: #ff4d4d; width: auto; padding: 5px 15px; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>إدارة المنيو</h1>
+    <div class="box">
+        <h2>إدارة المنيو أونلاين</h2>
         
-        <div id="add-form">
-            <h3>إضافة صنف جديد</h3>
-            <input type="text" id="itemName" placeholder="اسم المشروب / الصنف">
-            
-            <input type="text" id="itemCategory" list="categoriesList" placeholder="القسمً ">
-            <datalist id="categoriesList">
-                <option value="HOT DRINKS">
-                <option value="COLD DRINKS">
-                <option value="FRAPPE">
-                <option value="SMOOTHIES">
-                <option value="MILKSHAKES">
-                <option value="SOFT DRINKS">
-            </datalist>
-
-           <input type="number" id="priceSmall" placeholder="السعر الصغير">
-            <input type="number" id="priceLarge" placeholder="السعر الكبير">
-            <button onclick="addItem()">إضافة للمنيو</button>
-        </div>
-
+        <button class="setup-btn" onclick="setupFullMenu()">تنزيل المنيو الأصلية كاملة (مرة واحدة فقط)</button>
+        
         <hr>
+        <h3>إضافة صنف جديد</h3>
+        <input type="text" id="itemName" placeholder="اسم المنتج">
+        <input type="text" id="itemCat" placeholder="القسم ">
+        <input type="number" id="pSmall" placeholder="السعر الصغير">
+        <input type="number" id="pLarge" placeholder="السعر الكبير ">
+        <button onclick="addItem()">إضافة للمنيو</button>
 
-        <div id="currentItems">
-            </div>
+        <div id="list" style="margin-top:20px; text-align:right;"></div>
     </div>
 
-    <script src="admin.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDndtpI55_IqfqUEUQZ4isyDPN8B5ncTi4",
+            databaseURL: "https://icenbeans-c092b-default-rtdb.firebaseio.com",
+            projectId: "icenbeans-c092b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // عرض البيانات
+        db.ref('menu').on('value', (snapshot) => {
+            const data = snapshot.val() || [];
+            const listDiv = document.getElementById('list');
+            listDiv.innerHTML = '<h4>الأصناف المتاحة الآن:</h4>';
+            data.forEach((item, index) => {
+                listDiv.innerHTML += `
+                    <div class="admin-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small>${item.category} | ${item.small} L.E</small>
+                        </div>
+                        <button class="del-btn" onclick="deleteItem(${index})">حذف</button>
+                    </div>`;
+            });
+        });
+
+        // المنيو الكاملة اللي سألت عليها
+        function setupFullMenu() {
+            const fullMenu = [
+                // HOT DRINKS
+                { name: "ESPRESSO", category: "HOT DRINKS", small: 40, large: 50 },
+                { name: "AMERICANO", category: "HOT DRINKS", small: 50, large: 60 },
+                { name: "CAPPUCCINO", category: "HOT DRINKS", small: 55, large: 65 },
+                { name: "LATTE", category: "HOT DRINKS", small: 50, large: 60 },
+                { name: "MOCHA", category: "HOT DRINKS", small: 55, large: 65 },
+                { name: "TURKISH COFFEE", category: "HOT DRINKS", small: 20, large: 30 },
+                { name: "HOT CHOCOLATE", category: "HOT DRINKS", small: 45, large: 55 },
+                // COLD DRINKS
+                { name: "ICE LATTE", category: "COLD DRINKS", small: 65, large: 75 },
+                { name: "ICE MOCHA", category: "COLD DRINKS", small: 80, large: 70 },
+                { name: "SPANISH LATTE", category: "COLD DRINKS", small: 70, large: 80 },
+                // FRAPPE
+                { name: "CHOCOLATE FRAPPE", category: "FRAPPE", small: 75, large: 85 },
+                { name: "CARAMEL FRAPPE", category: "FRAPPE", small: 75, large: 85 },
+                // SMOOTHIES
+                { name: "MANGO / PEACH", category: "SMOOTHIES", small: 40, large: 50 },
+                { name: "MIX BERRIES", category: "SMOOTHIES", small: 40, large: 50 },
+                // SOFT DRINKS
+                { name: "COCA / SPRITE / FANTA", category: "SOFT DRINKS", small: 20, large: 0 },
+                { name: "REDBULL", category: "SOFT DRINKS", small: 55, large: 0 }
+            ];
+            
+            if(confirm("هل تريد رفع المنيو الأصلية كاملة؟")) {
+                db.ref('menu').set(fullMenu);
+            }
+        }
+
+        function addItem() {
+            const name = document.getElementById('itemName').value.toUpperCase();
+            const category = document.getElementById('itemCat').value.toUpperCase();
+            const small = document.getElementById('pSmall').value;
+            const large = document.getElementById('pLarge').value || 0;
+            if(name && category && small) {
+                db.ref('menu').once('value').then(s => {
+                    const d = s.val() || [];
+                    d.push({name, category, small: parseInt(small), large: parseInt(large)});
+                    db.ref('menu').set(d);
+                });
+            }
+        }
+
+        function deleteItem(i) {
+            if(confirm('حذف؟')) {
+                db.ref('menu').once('value').then(s => {
+                    const d = s.val();
+                    d.splice(i, 1);
+                    db.ref('menu').set(d);
+                });
+            }
+        }
+    </script>
 </body>
 </html>
