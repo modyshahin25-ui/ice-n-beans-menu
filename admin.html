@@ -2,37 +2,48 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم المنيو - Ice N Beans</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم Ice N Beans</title>
     <style>
-        body { font-family: Arial; padding: 20px; background: #f4f4f4; direction: rtl; }
-        .form-container { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #d4af37; color: black; font-weight: bold; cursor: pointer; }
-        .item-list { margin-top: 20px; }
-        .admin-item { background: #eee; padding: 10px; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background-color: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        .admin-item { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; text-align: right; }
+        .delete-btn { background-color: #dc3545; padding: 5px 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>إضافة صنف جديد</h2>
-    <input type="text" id="itemName" placeholder="اسم المشروب">
-    <select id="itemCategory">
-        <option value="HOT DRINKS">HOT DRINKS</option>
-        <option value="COLD DRINKS">COLD DRINKS</option>
-        <option value="FRAPPE">FRAPPE</option>
-        <option value="SMOOTHIES">SMOOTHIES</option>
-        <option value="MILKSHAKES">MILKSHAKES</option>
-    </select>
-    <input type="number" id="priceSmall" placeholder="السعر الصغير">
-    <input type="number" id="priceLarge" placeholder="السعر الكبير">
-    <button onclick="addItem()">إضافة للمنيو</button>
-</div>
+    <div class="container">
+        <h1>إدارة المنيو</h1>
+        
+        <div id="add-form">
+            <h3>إضافة صنف جديد</h3>
+            <input type="text" id="itemName" placeholder="اسم المشروب / الصنف">
+            
+            <input type="text" id="itemCategory" list="categoriesList" placeholder="القسمً ">
+            <datalist id="categoriesList">
+                <option value="HOT DRINKS">
+                <option value="COLD DRINKS">
+                <option value="FRAPPE">
+                <option value="SMOOTHIES">
+                <option value="MILKSHAKES">
+                <option value="SOFT DRINKS">
+            </datalist>
 
-<div class="form-container item-list" id="currentItems">
-    <h2>الأصناف الحالية</h2>
+           <input type="number" id="priceSmall" placeholder="السعر الصغير">
+            <input type="number" id="priceLarge" placeholder="السعر الكبير">
+            <button onclick="addItem()">إضافة للمنيو</button>
+        </div>
+
+        <hr>
+
+        <div id="currentItems">
+            </div>
     </div>
 
-<script src="admin.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
