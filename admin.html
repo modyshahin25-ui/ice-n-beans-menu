@@ -7,30 +7,53 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f7f7f7; padding: 20px; direction: rtl; text-align: center; }
-        .box { max-width: 550px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; direction: rtl; }
+        .box { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 20px; }
+        
+        /* تصميم كارت الصنف */
+        .admin-item { 
+            background: #fff; border: 1px solid #eee; padding: 15px; 
+            margin-top: 10px; border-radius: 12px; display: flex; 
+            justify-content: space-between; align-items: center;
+            transition: transform 0.2s;
+        }
+        .admin-item:hover { transform: scale(1.01); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* أزرار التحكم في السعر */
+        .price-controls { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 5px 10px; border-radius: 30px; border: 1px solid #ddd; }
+        .btn-math { 
+            width: 35px; height: 35px; border-radius: 50%; border: none; 
+            font-size: 20px; font-weight: bold; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-plus { background: #28a745; color: white; }
+        .btn-minus { background: #dc3545; color: white; }
+        .btn-math:active { transform: scale(0.9); }
+        
+        .price-display { font-weight: bold; font-size: 18px; min-width: 40px; text-align: center; }
+        
+        .del-btn { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px; text-decoration: underline; }
+        
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .setup-btn { background: #6c757d; margin-bottom: 20px; }
-        .admin-item { background: #fff; border: 1px solid #eee; padding: 12px; margin-top: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .del-btn { background: #ff4d4d; width: auto; padding: 5px 15px; }
+        .add-btn { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>إدارة المنيو أونلاين</h2>
+        <h2>لوحة التحكم (Live) 🚀</h2>
+        <button onclick="setupFullMenu()" style="background:#6c757d; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-bottom:15px;">تنزيل المنيو الأصلية</button>
         
-        <button class="setup-btn" onclick="setupFullMenu()">تنزيل المنيو الأصلية كاملة (مرة واحدة فقط)</button>
-        
-        <hr>
-        <h3>إضافة صنف جديد</h3>
-        <input type="text" id="itemName" placeholder="اسم المنتج">
-        <input type="text" id="itemCat" placeholder="القسم ">
-        <input type="number" id="pSmall" placeholder="السعر الصغير">
-        <input type="number" id="pLarge" placeholder="السعر الكبير ">
-        <button onclick="addItem()">إضافة للمنيو</button>
+        <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <h4>إضافة صنف جديد</h4>
+            <input type="text" id="itemName" placeholder="اسم المنتج">
+            <input type="text" id="itemCat" placeholder="القسم">
+            <input type="number" id="pSmall" placeholder="السعر">
+            <button class="add-btn" onclick="addItem()">إضافة للمنيو</button>
+        </div>
 
-        <div id="list" style="margin-top:20px; text-align:right;"></div>
+        <div id="list" style="text-align:right;"></div>
     </div>
 
     <script>
@@ -42,76 +65,83 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // عرض البيانات
-        db.ref('menu').on('value', (snapshot) => {
-            const data = snapshot.val() || [];
+        // عرض البيانات مع أزرار + و -
+        db.ref('menu').on('value', (s) => {
+            const data = s.val() || [];
             const listDiv = document.getElementById('list');
-            listDiv.innerHTML = '<h4>الأصناف المتاحة الآن:</h4>';
-            data.forEach((item, index) => {
-                listDiv.innerHTML += `
-                    <div class="admin-item">
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            <small>${item.category} | ${item.small} L.E</small>
-                        </div>
-                        <button class="del-btn" onclick="deleteItem(${index})">حذف</button>
-                    </div>`;
-            });
+            listDiv.innerHTML = '<h4>الأصناف الحالية:</h4>';
+            
+            data.forEach((item, i) => {
+    listDiv.innerHTML += `
+        <div class="admin-item">
+            <div>
+                <strong>${item.name}</strong> <br>
+                <button class="del-btn" onclick="deleteItem(${i})">حذف الصنف</button>
+            </div>
+            
+            <div class="price-controls">
+                <button class="btn-math btn-minus" onclick="changePrice(${i}, -5)">-</button>
+                
+                <input type="number" 
+                       id="manual-price-${i}" 
+                       value="${item.small}" 
+                       onchange="updatePriceManual(${i}, this.value)"
+                       style="width: 60px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 18px; margin: 0;">
+                
+                <button class="btn-math btn-plus" onclick="changePrice(${i}, 5)">+</button>
+            </div>
+        </div>`;
+});
         });
 
-        // المنيو الكاملة اللي سألت عليها
-        function setupFullMenu() {
-            const fullMenu = [
-                // HOT DRINKS
-                { name: "ESPRESSO", category: "HOT DRINKS", small: 40, large: 50 },
-                { name: "AMERICANO", category: "HOT DRINKS", small: 50, large: 60 },
-                { name: "CAPPUCCINO", category: "HOT DRINKS", small: 55, large: 65 },
-                { name: "LATTE", category: "HOT DRINKS", small: 50, large: 60 },
-                { name: "MOCHA", category: "HOT DRINKS", small: 55, large: 65 },
-                { name: "TURKISH COFFEE", category: "HOT DRINKS", small: 20, large: 30 },
-                { name: "HOT CHOCOLATE", category: "HOT DRINKS", small: 45, large: 55 },
-                // COLD DRINKS
-                { name: "ICE LATTE", category: "COLD DRINKS", small: 65, large: 75 },
-                { name: "ICE MOCHA", category: "COLD DRINKS", small: 80, large: 70 },
-                { name: "SPANISH LATTE", category: "COLD DRINKS", small: 70, large: 80 },
-                // FRAPPE
-                { name: "CHOCOLATE FRAPPE", category: "FRAPPE", small: 75, large: 85 },
-                { name: "CARAMEL FRAPPE", category: "FRAPPE", small: 75, large: 85 },
-                // SMOOTHIES
-                { name: "MANGO / PEACH", category: "SMOOTHIES", small: 40, large: 50 },
-                { name: "MIX BERRIES", category: "SMOOTHIES", small: 40, large: 50 },
-                // SOFT DRINKS
-                { name: "COCA / SPRITE / FANTA", category: "SOFT DRINKS", small: 20, large: 0 },
-                { name: "REDBULL", category: "SOFT DRINKS", small: 55, large: 0 }
-            ];
-            
-            if(confirm("هل تريد رفع المنيو الأصلية كاملة؟")) {
-                db.ref('menu').set(fullMenu);
-            }
+        // دالة تغيير السعر بالزيادة والنقصان
+        function changePrice(index, amount) {
+            db.ref('menu').once('value').then(snap => {
+                const data = snap.val();
+                let currentPrice = parseInt(data[index].small);
+                
+                // منع السعر ينزل عن 0
+                if (currentPrice + amount >= 0) {
+                    data[index].small = currentPrice + amount;
+                    db.ref('menu').set(data);
+                }
+            });
         }
 
         function addItem() {
-            const name = document.getElementById('itemName').value.toUpperCase();
-            const category = document.getElementById('itemCat').value.toUpperCase();
-            const small = document.getElementById('pSmall').value;
-            const large = document.getElementById('pLarge').value || 0;
-            if(name && category && small) {
-                db.ref('menu').once('value').then(s => {
-                    const d = s.val() || [];
-                    d.push({name, category, small: parseInt(small), large: parseInt(large)});
-                    db.ref('menu').set(d);
+            const n = document.getElementById('itemName').value.toUpperCase();
+            const c = document.getElementById('itemCat').value.toUpperCase();
+            const s = document.getElementById('pSmall').value;
+            if(n && c && s) {
+                db.ref('menu').once('value').then(snap => {
+                    const d = snap.val() || [];
+                    d.push({name:n, category:c, small:parseInt(s), large:0});
+                    db.ref('menu').set(d).then(() => {
+                        document.getElementById('itemName').value = '';
+                        document.getElementById('pSmall').value = '';
+                    });
                 });
             }
         }
 
         function deleteItem(i) {
-            if(confirm('حذف؟')) {
-                db.ref('menu').once('value').then(s => {
-                    const d = s.val();
+            if(confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
+                db.ref('menu').once('value').then(snap => {
+                    const d = snap.val();
                     d.splice(i, 1);
                     db.ref('menu').set(d);
                 });
             }
+        }
+
+        function setupFullMenu() {
+            const m = [
+                {name:"ESPRESSO", category:"HOT DRINKS", small:40, large:0},
+                {name:"AMERICANO", category:"HOT DRINKS", small:50, large:0},
+                {name:"LATTE", category:"HOT DRINKS", small:50, large:0},
+                {name:"ICE LATTE", category:"COLD DRINKS", small:65, large:0}
+            ];
+            if(confirm("رفع المنيو الأساسية؟")) db.ref('menu').set(m);
         }
     </script>
 </body>

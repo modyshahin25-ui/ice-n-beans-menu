@@ -51,9 +51,18 @@ function addItem() {
 }
 
 // تحديث السعر عند التغيير
-function updatePrice(index, type, value) {
-    menuData[index][type] = parseInt(value);
-    saveAndRefresh();
+// دالة التعديل اليدوي عند الكتابة في الخانة
+function updatePriceManual(index, newValue) {
+    const price = parseInt(newValue);
+    if (!isNaN(price) && price >= 0) {
+        db.ref('menu').once('value').then(snap => {
+            const data = snap.val();
+            data[index].small = price;
+            db.ref('menu').set(data);
+        });
+    } else {
+        alert("يرجى إدخال رقم صحيح");
+    }
 }
 
 // حذف صنف
