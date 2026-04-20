@@ -1,295 +1,547 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - Ice N Beans</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; direction: rtl; }
-        .box { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { color: #333; margin-bottom: 20px; }
-        
-        /* تصميم كارت الصنف */
-        .admin-item { 
-            background: #fff; border: 1px solid #eee; padding: 15px; 
-            margin-top: 10px; border-radius: 12px; display: flex; 
-            justify-content: space-between; align-items: center;
-            transition: transform 0.2s;
-        }
-        .admin-item:hover { transform: scale(1.01); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - Ice N Beans</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* أزرار التحكم في السعر */
-        .price-controls { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 5px 10px; border-radius: 30px; border: 1px solid #ddd; }
-        .btn-math { 
-            width: 35px; height: 35px; border-radius: 50%; border: none; 
-            font-size: 20px; font-weight: bold; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-        }
-        .btn-plus { background: #28a745; color: white; }
-        .btn-minus { background: #dc3545; color: white; }
-        .btn-math:active { transform: scale(0.9); }
-        
-        .price-display { font-weight: bold; font-size: 18px; min-width: 40px; text-align: center; }
-        
-        .del-btn { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px; text-decoration: underline; }
-        
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .add-btn { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    </style>
+    :root {
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --border: #e4e7ec;
+      --text: #1a1d23;
+      --muted: #6b7280;
+      --accent: #1a1d23;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --info-bg: #eff6ff;
+      --info-text: #1d4ed8;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    /* ===== LOGIN ===== */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1d23 0%, #2d3748 100%);
+    }
+
+    .login-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .login-logo {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: #1a1d23;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700;
+      margin: 0 auto 1.5rem;
+      letter-spacing: 1px;
+    }
+
+    .login-card h2 {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      color: var(--text);
+      background: #f9fafb;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus { outline: none; border-color: var(--accent); background: white; }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a1d23;
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .login-btn:hover { opacity: 0.88; }
+    .login-btn:active { transform: scale(0.98); }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 0.75rem;
+      min-height: 18px;
+    }
+
+    /* ===== DASHBOARD ===== */
+    #dashboard { display: none; }
+
+    .top-bar {
+      background: #1a1d23;
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .top-bar .brand { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+    .top-bar .brand span { opacity: 0.5; font-weight: 400; font-size: 13px; margin-right: 8px; }
+
+    .logout-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.18); }
+
+    .page { max-width: 680px; margin: 0 auto; padding: 24px 16px 60px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    /* Form fields inside card */
+    .f-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+
+    .f-input, .f-select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      color: var(--text);
+      background: #f9fafb;
+      transition: border-color 0.2s;
+    }
+    .f-input:focus, .f-select:focus { outline: none; border-color: var(--accent); background: white; }
+
+    .f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .f-full { margin-bottom: 12px; }
+
+    .new-cat-field { margin-bottom: 12px; display: none; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a1d23;
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { opacity: 0.88; }
+    .submit-btn:active { transform: scale(0.98); }
+
+    .reset-link {
+      display: block;
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+      text-decoration: underline;
+      margin-bottom: 16px;
+    }
+    .reset-link:hover { color: var(--danger); }
+
+    /* Items list */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 6px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .item-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .item-del { font-size: 12px; color: var(--danger); background: none; border: none; cursor: pointer; font-family: 'Cairo', sans-serif; text-decoration: underline; margin-top: 2px; display: block; }
+
+    .prices { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    .price-box { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .price-tag { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; }
+
+    .stepper {
+      display: flex; align-items: center; gap: 4px;
+      background: #f9fafb;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
+      padding: 3px 6px;
+    }
+
+    .s-btn {
+      width: 28px; height: 28px; border-radius: 50%; border: none;
+      cursor: pointer; font-size: 18px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1; transition: transform 0.1s;
+      flex-shrink: 0;
+    }
+    .s-btn:active { transform: scale(0.88); }
+    .s-minus { background: #fee2e2; color: #dc2626; }
+    .s-plus  { background: #dcfce7; color: #16a34a; }
+
+    .s-input {
+      width: 48px; text-align: center;
+      border: none; background: transparent;
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--text);
+    }
+    .s-input:focus { outline: none; }
+    /* hide number arrows */
+    .s-input::-webkit-inner-spin-button,
+    .s-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    .price-sep { width: 1px; height: 36px; background: var(--border); }
+
+    .empty { text-align: center; padding: 2.5rem 0; color: var(--muted); font-size: 14px; }
+  </style>
 </head>
 <body>
-    <div class="box">
-        <h2>لوحة التحكم (Live) 🚀</h2>
-        <button onclick="setupFullMenu()" style="background:#6c757d; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-bottom:15px;">تنزيل المنيو الأصلية</button>
-        
-        <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <h4>إضافة صنف جديد</h4>
-            <input type="text" id="itemName" placeholder="اسم المنتج">
-            <input type="text" id="itemCat" placeholder="القسم">
-            <input type="number" id="pSmall" placeholder="السعر">
-            <button class="add-btn" onclick="addItem()">إضافة للمنيو</button>
-        </div>
 
-        <div id="list" style="text-align:right;"></div>
+<!-- ===== LOGIN ===== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">IB</div>
+    <h2>Ice N Beans</h2>
+    <p class="login-subtitle">لوحة تحكم الإدارة</p>
+    <div class="field">
+      <label>اسم المستخدم</label>
+      <input type="text" id="usr" placeholder="admin" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div class="field">
+      <label>كلمة المرور</label>
+      <input type="password" id="pwd" placeholder="••••••" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="login-btn" onclick="login()">دخول</button>
+    <p class="login-error" id="login-err"></p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard">
+  <div class="top-bar">
+    <div class="brand">Ice N Beans <span>Admin</span></div>
+    <button class="logout-btn" onclick="logout()">خروج</button>
+  </div>
+
+  <div class="page">
+
+    <!-- Add Item -->
+    <div class="card">
+      <div class="card-title">إضافة صنف جديد</div>
+
+      <div class="f-full">
+        <label class="f-label">اسم المنتج</label>
+        <input class="f-input" type="text" id="newName" placeholder="مثال: CAPPUCCINO">
+      </div>
+
+      <div class="f-full">
+        <label class="f-label">القسم</label>
+        <select class="f-select" id="catSelect" onchange="onCatChange()">
+          <option value="">— اختر قسم —</option>
+        </select>
+      </div>
+
+      <div class="new-cat-field" id="newCatWrap">
+        <label class="f-label">اسم القسم الجديد</label>
+        <input class="f-input" type="text" id="newCatInput" placeholder="مثال: SMOOTHIES">
+      </div>
+
+      <div class="f-row">
+        <div>
+          <label class="f-label">سعر Small (جنيه)</label>
+          <input class="f-input" type="number" id="pSmall" placeholder="0" min="0">
+        </div>
+        <div>
+          <label class="f-label">سعر Large (جنيه)</label>
+          <input class="f-input" type="number" id="pLarge" placeholder="0" min="0">
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="addItem()">إضافة للمنيو</button>
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDndtpI55_IqfqUEUQZ4isyDPN8B5ncTi4",
-            databaseURL: "https://icenbeans-c092b-default-rtdb.firebaseio.com",
-            projectId: "icenbeans-c092b"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // عرض البيانات مع أزرار + و -
-        db.ref('menu').on('value', (s) => {
-            const data = s.val() || [];
-            const listDiv = document.getElementById('list');
-            listDiv.innerHTML = '<h4>الأصناف الحالية:</h4>';
-            
-            data.forEach((item, i) => {
-    listDiv.innerHTML += `
-        <div class="admin-item">
-            <div>
-                <strong>${item.name}</strong> <br>
-                <button class="del-btn" onclick="deleteItem(${i})">حذف الصنف</button>
-            </div>
-            
-            <div class="price-controls">
-                <button class="btn-math btn-minus" onclick="changePrice(${i}, -5)">-</button>
-                
-                <input type="number" 
-                       id="manual-price-${i}" 
-                       value="${item.small}" 
-                       onchange="updatePriceManual(${i}, this.value)"
-                       style="width: 60px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 18px; margin: 0;">
-                
-                <button class="btn-math btn-plus" onclick="changePrice(${i}, 5)">+</button>
-            </div>
-        </div>`;
-});
-        });
-
-        // دالة تغيير السعر بالزيادة والنقصان
-        function changePrice(index, amount) {
-            db.ref('menu').once('value').then(snap => {
-                const data = snap.val();
-                let currentPrice = parseInt(data[index].small);
-                
-                // منع السعر ينزل عن 0
-                if (currentPrice + amount >= 0) {
-                    data[index].small = currentPrice + amount;
-                    db.ref('menu').set(data);
-                }
-            });
-        }
-
-        function addItem() {
-            const n = document.getElementById('itemName').value.toUpperCase();
-            const c = document.getElementById('itemCat').value.toUpperCase();
-            const s = document.getElementById('pSmall').value;
-            if(n && c && s) {
-                db.ref('menu').once('value').then(snap => {
-                    const d = snap.val() || [];
-                    d.push({name:n, category:c, small:parseInt(s), large:0});
-                    db.ref('menu').set(d).then(() => {
-                        document.getElementById('itemName').value = '';
-                        document.getElementById('pSmall').value = '';
-                    });
-                });
-            }
-        }
-
-        function deleteItem(i) {
-            if(confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
-                db.ref('menu').once('value').then(snap => {
-                    const d = snap.val();
-                    d.splice(i, 1);
-                    db.ref('menu').set(d);
-                });
-            }
-        }
-
-        function setupFullMenu() {
-            const m = [
-                {name:"ESPRESSO", category:"HOT DRINKS", small:40, large:0},
-                {name:"AMERICANO", category:"HOT DRINKS", small:50, large:0},
-                {name:"LATTE", category:"HOT DRINKS", small:50, large:0},
-                {name:"ICE LATTE", category:"COLD DRINKS", small:65, large:0}
-            ];
-            if(confirm("رفع المنيو الأساسية؟")) db.ref('menu').set(m);
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - Ice N Beans</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; direction: rtl; }
-        .box { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { color: #333; margin-bottom: 20px; }
-        
-        /* تصميم كارت الصنف */
-        .admin-item { 
-            background: #fff; border: 1px solid #eee; padding: 15px; 
-            margin-top: 10px; border-radius: 12px; display: flex; 
-            justify-content: space-between; align-items: center;
-            transition: transform 0.2s;
-        }
-        .admin-item:hover { transform: scale(1.01); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-
-        /* أزرار التحكم في السعر */
-        .price-controls { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 5px 10px; border-radius: 30px; border: 1px solid #ddd; }
-        .btn-math { 
-            width: 35px; height: 35px; border-radius: 50%; border: none; 
-            font-size: 20px; font-weight: bold; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-        }
-        .btn-plus { background: #28a745; color: white; }
-        .btn-minus { background: #dc3545; color: white; }
-        .btn-math:active { transform: scale(0.9); }
-        
-        .price-display { font-weight: bold; font-size: 18px; min-width: 40px; text-align: center; }
-        
-        .del-btn { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px; text-decoration: underline; }
-        
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .add-btn { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h2>لوحة التحكم (Live) 🚀</h2>
-        <button onclick="setupFullMenu()" style="background:#6c757d; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-bottom:15px;">تنزيل المنيو الأصلية</button>
-        
-        <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <h4>إضافة صنف جديد</h4>
-            <input type="text" id="itemName" placeholder="اسم المنتج">
-            <input type="text" id="itemCat" placeholder="القسم">
-            <input type="number" id="pSmall" placeholder="السعر">
-            <button class="add-btn" onclick="addItem()">إضافة للمنيو</button>
-        </div>
-
-        <div id="list" style="text-align:right;"></div>
+    <!-- Items List -->
+    <div class="card">
+      <button class="reset-link" onclick="setupFullMenu()">تنزيل المنيو الأصلية</button>
+      <div id="itemsList"><div class="empty">جارٍ تحميل المنيو...</div></div>
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDndtpI55_IqfqUEUQZ4isyDPN8B5ncTi4",
-            databaseURL: "https://icenbeans-c092b-default-rtdb.firebaseio.com",
-            projectId: "icenbeans-c092b"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+  </div>
+</div>
 
-        // عرض البيانات مع أزرار + و -
-        db.ref('menu').on('value', (s) => {
-            const data = s.val() || [];
-            const listDiv = document.getElementById('list');
-            listDiv.innerHTML = '<h4>الأصناف الحالية:</h4>';
-            
-            data.forEach((item, i) => {
-    listDiv.innerHTML += `
-        <div class="admin-item">
-            <div>
-                <strong>${item.name}</strong> <br>
-                <button class="del-btn" onclick="deleteItem(${i})">حذف الصنف</button>
+<script>
+  // ===== AUTH =====
+  const ADMIN_USER = 'admin';
+  const ADMIN_PASS = 'icenbean2026';
+
+  function login() {
+    const u = document.getElementById('usr').value.trim();
+    const p = document.getElementById('pwd').value.trim();
+    const err = document.getElementById('login-err');
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      startListen();
+    } else {
+      err.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+      document.getElementById('pwd').value = '';
+    }
+  }
+
+  function logout() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('usr').value = '';
+    document.getElementById('pwd').value = '';
+    document.getElementById('login-err').textContent = '';
+  }
+
+  // ===== FIREBASE =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyDndtpI55_IqfqUEUQZ4isyDPN8B5ncTi4",
+    databaseURL: "https://icenbeans-c092b-default-rtdb.firebaseio.com",
+    projectId: "icenbeans-c092b"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function startListen() {
+    db.ref('menu').on('value', snap => {
+      const data = snap.val() || [];
+      renderItems(data);
+      updateCatSelect(data);
+    });
+  }
+
+  // ===== CATEGORY SELECT =====
+  function updateCatSelect(data) {
+    const cats = [...new Set(data.map(i => i.category).filter(Boolean))];
+    const sel = document.getElementById('catSelect');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— اختر قسم —</option>';
+    cats.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      sel.appendChild(o);
+    });
+    const newOpt = document.createElement('option');
+    newOpt.value = '__new__'; newOpt.textContent = '+ قسم جديد';
+    sel.appendChild(newOpt);
+    if (prev) sel.value = prev;
+  }
+
+  function onCatChange() {
+    document.getElementById('newCatWrap').style.display =
+      document.getElementById('catSelect').value === '__new__' ? 'block' : 'none';
+  }
+
+  function getCategory() {
+    const v = document.getElementById('catSelect').value;
+    if (v === '__new__') return document.getElementById('newCatInput').value.trim().toUpperCase();
+    return v;
+  }
+
+  // ===== RENDER =====
+  function renderItems(data) {
+    const cont = document.getElementById('itemsList');
+    if (!data.length) { cont.innerHTML = '<div class="empty">لا توجد أصناف بعد</div>'; return; }
+
+    const byCat = {};
+    data.forEach((item, i) => {
+      const cat = item.category || 'بدون قسم';
+      if (!byCat[cat]) byCat[cat] = [];
+      byCat[cat].push({ ...item, _i: i });
+    });
+
+    let html = '';
+    Object.keys(byCat).forEach(cat => {
+      html += `<div class="section-label">${cat}</div>`;
+      byCat[cat].forEach(item => {
+        const i = item._i;
+        html += `
+        <div class="item-row">
+          <div class="item-info">
+            <div class="item-name">${item.name}</div>
+            <button class="item-del" onclick="deleteItem(${i})">حذف الصنف</button>
+          </div>
+          <div class="prices">
+            <div class="price-box">
+              <span class="price-tag">SMALL</span>
+              <div class="stepper">
+                <button class="s-btn s-minus" onclick="changePrice(${i},'small',-5)">−</button>
+                <input class="s-input" type="number" id="sp-${i}" value="${item.small || 0}" onchange="manualPrice(${i},'small',this.value)">
+                <button class="s-btn s-plus" onclick="changePrice(${i},'small',5)">+</button>
+              </div>
             </div>
-            
-            <div class="price-controls">
-                <button class="btn-math btn-minus" onclick="changePrice(${i}, -5)">-</button>
-                
-                <input type="number" 
-                       id="manual-price-${i}" 
-                       value="${item.small}" 
-                       onchange="updatePriceManual(${i}, this.value)"
-                       style="width: 60px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 18px; margin: 0;">
-                
-                <button class="btn-math btn-plus" onclick="changePrice(${i}, 5)">+</button>
+            <div class="price-sep"></div>
+            <div class="price-box">
+              <span class="price-tag">LARGE</span>
+              <div class="stepper">
+                <button class="s-btn s-minus" onclick="changePrice(${i},'large',-5)">−</button>
+                <input class="s-input" type="number" id="lp-${i}" value="${item.large || 0}" onchange="manualPrice(${i},'large',this.value)">
+                <button class="s-btn s-plus" onclick="changePrice(${i},'large',5)">+</button>
+              </div>
             </div>
+          </div>
         </div>`;
-});
-        });
+      });
+    });
+    cont.innerHTML = html;
+  }
 
-        // دالة تغيير السعر بالزيادة والنقصان
-        function changePrice(index, amount) {
-            db.ref('menu').once('value').then(snap => {
-                const data = snap.val();
-                let currentPrice = parseInt(data[index].small);
-                
-                // منع السعر ينزل عن 0
-                if (currentPrice + amount >= 0) {
-                    data[index].small = currentPrice + amount;
-                    db.ref('menu').set(data);
-                }
-            });
-        }
+  // ===== PRICE ACTIONS =====
+  function changePrice(idx, size, delta) {
+    db.ref('menu').once('value').then(snap => {
+      const d = snap.val();
+      let cur = parseInt(d[idx][size]) || 0;
+      if (cur + delta >= 0) { d[idx][size] = cur + delta; db.ref('menu').set(d); }
+    });
+  }
 
-        function addItem() {
-            const n = document.getElementById('itemName').value.toUpperCase();
-            const c = document.getElementById('itemCat').value.toUpperCase();
-            const s = document.getElementById('pSmall').value;
-            if(n && c && s) {
-                db.ref('menu').once('value').then(snap => {
-                    const d = snap.val() || [];
-                    d.push({name:n, category:c, small:parseInt(s), large:0});
-                    db.ref('menu').set(d).then(() => {
-                        document.getElementById('itemName').value = '';
-                        document.getElementById('pSmall').value = '';
-                    });
-                });
-            }
-        }
+  function manualPrice(idx, size, val) {
+    const v = parseInt(val);
+    if (!isNaN(v) && v >= 0) {
+      db.ref('menu').once('value').then(snap => {
+        const d = snap.val();
+        d[idx][size] = v;
+        db.ref('menu').set(d);
+      });
+    }
+  }
 
-        function deleteItem(i) {
-            if(confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
-                db.ref('menu').once('value').then(snap => {
-                    const d = snap.val();
-                    d.splice(i, 1);
-                    db.ref('menu').set(d);
-                });
-            }
-        }
+  // ===== ADD / DELETE =====
+  function addItem() {
+    const name = document.getElementById('newName').value.trim().toUpperCase();
+    const cat  = getCategory();
+    const sm   = parseInt(document.getElementById('pSmall').value) || 0;
+    const lg   = parseInt(document.getElementById('pLarge').value) || 0;
+    if (!name || !cat) { alert('يرجى إدخال الاسم واختيار القسم'); return; }
+    db.ref('menu').once('value').then(snap => {
+      const d = snap.val() || [];
+      d.push({ name, category: cat, small: sm, large: lg });
+      db.ref('menu').set(d).then(() => {
+        document.getElementById('newName').value = '';
+        document.getElementById('pSmall').value = '';
+        document.getElementById('pLarge').value = '';
+        document.getElementById('catSelect').value = '';
+        document.getElementById('newCatWrap').style.display = 'none';
+        document.getElementById('newCatInput').value = '';
+      });
+    });
+  }
 
-        function setupFullMenu() {
-            const m = [
-                {name:"ESPRESSO", category:"HOT DRINKS", small:40, large:0},
-                {name:"AMERICANO", category:"HOT DRINKS", small:50, large:0},
-                {name:"LATTE", category:"HOT DRINKS", small:50, large:0},
-                {name:"ICE LATTE", category:"COLD DRINKS", small:65, large:0}
-            ];
-            if(confirm("رفع المنيو الأساسية؟")) db.ref('menu').set(m);
-        }
-    </script>
+  function deleteItem(i) {
+    if (confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
+      db.ref('menu').once('value').then(snap => {
+        const d = snap.val();
+        d.splice(i, 1);
+        db.ref('menu').set(d);
+      });
+    }
+  }
+
+  // ===== RESET MENU =====
+  function setupFullMenu() {
+    const m = [
+      {name:"ESPRESSO",    category:"HOT DRINKS",  small:40, large:0},
+      {name:"AMERICANO",   category:"HOT DRINKS",  small:50, large:60},
+      {name:"LATTE",       category:"HOT DRINKS",  small:55, large:65},
+      {name:"CAPPUCCINO",  category:"HOT DRINKS",  small:55, large:65},
+      {name:"ICE LATTE",   category:"COLD DRINKS", small:65, large:75},
+      {name:"FRAPPUCCINO", category:"COLD DRINKS", small:70, large:85},
+    ];
+    if (confirm('رفع المنيو الأساسية؟ سيتم استبدال البيانات الحالية.')) db.ref('menu').set(m);
+  }
+</script>
 </body>
 </html>
