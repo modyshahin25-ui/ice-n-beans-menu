@@ -145,4 +145,151 @@
         }
     </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - Ice N Beans</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; direction: rtl; }
+        .box { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 20px; }
+        
+        /* تصميم كارت الصنف */
+        .admin-item { 
+            background: #fff; border: 1px solid #eee; padding: 15px; 
+            margin-top: 10px; border-radius: 12px; display: flex; 
+            justify-content: space-between; align-items: center;
+            transition: transform 0.2s;
+        }
+        .admin-item:hover { transform: scale(1.01); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* أزرار التحكم في السعر */
+        .price-controls { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 5px 10px; border-radius: 30px; border: 1px solid #ddd; }
+        .btn-math { 
+            width: 35px; height: 35px; border-radius: 50%; border: none; 
+            font-size: 20px; font-weight: bold; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-plus { background: #28a745; color: white; }
+        .btn-minus { background: #dc3545; color: white; }
+        .btn-math:active { transform: scale(0.9); }
+        
+        .price-display { font-weight: bold; font-size: 18px; min-width: 40px; text-align: center; }
+        
+        .del-btn { background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px; text-decoration: underline; }
+        
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .add-btn { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>لوحة التحكم (Live) 🚀</h2>
+        <button onclick="setupFullMenu()" style="background:#6c757d; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-bottom:15px;">تنزيل المنيو الأصلية</button>
+        
+        <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <h4>إضافة صنف جديد</h4>
+            <input type="text" id="itemName" placeholder="اسم المنتج">
+            <input type="text" id="itemCat" placeholder="القسم">
+            <input type="number" id="pSmall" placeholder="السعر">
+            <button class="add-btn" onclick="addItem()">إضافة للمنيو</button>
+        </div>
+
+        <div id="list" style="text-align:right;"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDndtpI55_IqfqUEUQZ4isyDPN8B5ncTi4",
+            databaseURL: "https://icenbeans-c092b-default-rtdb.firebaseio.com",
+            projectId: "icenbeans-c092b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // عرض البيانات مع أزرار + و -
+        db.ref('menu').on('value', (s) => {
+            const data = s.val() || [];
+            const listDiv = document.getElementById('list');
+            listDiv.innerHTML = '<h4>الأصناف الحالية:</h4>';
+            
+            data.forEach((item, i) => {
+    listDiv.innerHTML += `
+        <div class="admin-item">
+            <div>
+                <strong>${item.name}</strong> <br>
+                <button class="del-btn" onclick="deleteItem(${i})">حذف الصنف</button>
+            </div>
+            
+            <div class="price-controls">
+                <button class="btn-math btn-minus" onclick="changePrice(${i}, -5)">-</button>
+                
+                <input type="number" 
+                       id="manual-price-${i}" 
+                       value="${item.small}" 
+                       onchange="updatePriceManual(${i}, this.value)"
+                       style="width: 60px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 18px; margin: 0;">
+                
+                <button class="btn-math btn-plus" onclick="changePrice(${i}, 5)">+</button>
+            </div>
+        </div>`;
+});
+        });
+
+        // دالة تغيير السعر بالزيادة والنقصان
+        function changePrice(index, amount) {
+            db.ref('menu').once('value').then(snap => {
+                const data = snap.val();
+                let currentPrice = parseInt(data[index].small);
+                
+                // منع السعر ينزل عن 0
+                if (currentPrice + amount >= 0) {
+                    data[index].small = currentPrice + amount;
+                    db.ref('menu').set(data);
+                }
+            });
+        }
+
+        function addItem() {
+            const n = document.getElementById('itemName').value.toUpperCase();
+            const c = document.getElementById('itemCat').value.toUpperCase();
+            const s = document.getElementById('pSmall').value;
+            if(n && c && s) {
+                db.ref('menu').once('value').then(snap => {
+                    const d = snap.val() || [];
+                    d.push({name:n, category:c, small:parseInt(s), large:0});
+                    db.ref('menu').set(d).then(() => {
+                        document.getElementById('itemName').value = '';
+                        document.getElementById('pSmall').value = '';
+                    });
+                });
+            }
+        }
+
+        function deleteItem(i) {
+            if(confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
+                db.ref('menu').once('value').then(snap => {
+                    const d = snap.val();
+                    d.splice(i, 1);
+                    db.ref('menu').set(d);
+                });
+            }
+        }
+
+        function setupFullMenu() {
+            const m = [
+                {name:"ESPRESSO", category:"HOT DRINKS", small:40, large:0},
+                {name:"AMERICANO", category:"HOT DRINKS", small:50, large:0},
+                {name:"LATTE", category:"HOT DRINKS", small:50, large:0},
+                {name:"ICE LATTE", category:"COLD DRINKS", small:65, large:0}
+            ];
+            if(confirm("رفع المنيو الأساسية؟")) db.ref('menu').set(m);
+        }
+    </script>
+</body>
 </html>
