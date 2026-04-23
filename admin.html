@@ -265,15 +265,25 @@
   //  Category select
   // ============================================================
   function updateCatSelect(data) {
-    const cats = new Set();
+    // Key by categoryAr to avoid duplicates; support both new and legacy format
+    const catMap = {};
     Object.values(data).forEach(i => {
-      if (i.categoryAr && i.categoryEn) cats.add(i.categoryAr + ' / ' + i.categoryEn);
-      else if (i.category) cats.add(i.category);
+      if (i.categoryAr) {
+        if (!catMap[i.categoryAr]) {
+          catMap[i.categoryAr] = i.categoryEn
+            ? i.categoryAr + ' / ' + i.categoryEn
+            : i.categoryAr;
+        }
+      } else if (i.category) {
+        if (!catMap[i.category]) catMap[i.category] = i.category;
+      }
     });
     const sel = document.getElementById('catSelect');
     const cur = sel.value;
     sel.innerHTML = '<option value="">— اختر قسم —</option>';
-    cats.forEach(c => { sel.innerHTML += `<option value="${c}">${c}</option>`; });
+    Object.values(catMap).forEach(c => {
+      sel.innerHTML += '<option value="' + c + '">' + c + '</option>';
+    });
     sel.innerHTML += '<option value="__new__">+ قسم جديد</option>';
     if (cur) sel.value = cur;
   }
