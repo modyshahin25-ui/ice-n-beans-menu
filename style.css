@@ -1,0 +1,225 @@
+/* ============================================================
+   ICE N BEANS — Menu Stylesheet
+   Theme: Dark luxury — Black / Deep Brown / Gold
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Cairo:wght@400;500;600&display=swap');
+
+:root {
+  --bg:          #0d0d0d;
+  --surface:     #161410;
+  --surface-2:   #1e1b16;
+  --border:      #2e2a22;
+  --gold:        #c9a84c;
+  --gold-light:  #e2c97e;
+  --gold-dim:    #7a6430;
+  --text:        #f0ead8;
+  --text-muted:  #9a8f78;
+  --size-pill:   #252015;
+  --divider:     rgba(201,168,76,0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.menu-header {
+  background: #000;
+  text-align: center;
+  /* padding: 2px 0px 4px;   */
+  border-bottom: 1.5px solid var(--gold-dim);
+}
+
+.menu-header .logo-wrap {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-header .logo-img {
+  width: 370px;
+  height: 370px;
+  object-fit:scale-down;
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));
+}
+
+/* Hide old text — logo image is the brand */
+.menu-header h1,
+.menu-header p { display: none; }
+
+/* ── CONTAINER ── */
+.container {
+  padding: 20px 14px;
+  max-width: 620px;
+  margin: auto;
+}
+
+/* ── MENU SECTION ── */
+.menu-section {
+  margin-bottom: 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.menu-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--surface);
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ── ITEM ROW ── */
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--divider);
+  transition: background 0.2s;
+}
+
+.item:last-child { border-bottom: none; }
+.item:hover { background: rgba(201,168,76,0.035); }
+
+.item > span:first-child {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.45;
+  flex: 1;
+}
+
+/* ── PRICES — right side ── */
+.item-prices {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+/* single price with no sizes */
+.price-single {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  white-space: nowrap;
+}
+
+.currency {
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.65rem;
+  color: var(--gold-dim);
+  margin-right: 2px;
+}
+
+/* size pill */
+.size-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--size-pill);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px 3px 7px;
+  white-space: nowrap;
+}
+
+.size-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.size-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  flex-shrink: 0;
+}
+
+.size-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+/* ── SOCIAL MEDIA ── */
+.social-media {
+  text-align: center;
+  margin-top: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 22px 20px;
+  border-radius: 14px;
+}
+
+.social-media h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.75rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 30px;
+  border: 1.5px solid var(--gold-dim);
+  color: var(--gold);
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.links a:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #000;
+}
+
+/* ── FOOTER ── */
+.contact-info {
+  text-align: center;
+  font-size: 0.73rem;
+  padding: 20px;
+  color: var(--text-muted);
+  line-height: 2;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.whatsapp-btn { background: transparent; color: white; }
+.phone-btn    { background: transparent; color: white; }
