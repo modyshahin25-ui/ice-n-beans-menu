@@ -33,15 +33,22 @@ body { background-color: var(--bg); color: var(--text); font-family: 'Cairo', sa
 /* ── CONTAINER ── */
 .container { padding: 20px 14px; max-width: 620px; margin: auto; }
 
+/* ── CATEGORY NAV BAR ── */
+.cat-nav-wrap { background: #000; border-bottom: 1px solid var(--gold-dim); position: sticky; top: 0; z-index: 100; }
+.cat-nav { display: flex; justify-content: center; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding: 10px 14px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.cat-nav::-webkit-scrollbar { display: none; }
+.cat-btn { flex-shrink: 0; background: transparent; border: 1.5px solid var(--gold-dim); color: var(--gold); font-family: 'Cairo', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 6px 16px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all 0.2s; letter-spacing: 0.3px; }
+.cat-btn:hover, .cat-btn.active { background: var(--gold); border-color: var(--gold); color: #000; }
+
 /* ── MENU SECTION ── */
 .menu-section { margin-bottom: 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-.menu-section h2 { font-family: 'Playfair Display', serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); background: var(--surface); padding: 13px 18px; border-bottom: 1px solid var(--border); margin: 0; }
+.menu-section h2 { font-family: 'Cairo', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); background: var(--surface); padding: 13px 18px; border-bottom: 1px solid var(--border); margin: 0; }
 
 /* ── ITEM ROW ── */
 .item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--divider); transition: background 0.2s; }
 .item:last-child { border-bottom: none; }
 .item:hover { background: rgba(201,168,76,0.035); }
-.item > span:first-child { font-size: 0.9rem; font-weight: 500; color: var(--text); line-height: 1.45; flex: 1; }
+.item > span:first-child { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 400; color: var(--text); line-height: 1.45; flex: 1; }
 
 /* ── PRICES ── */
 .item-prices { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
@@ -60,7 +67,7 @@ body { background-color: var(--bg); color: var(--text); font-family: 'Cairo', sa
 .links a:hover { background: var(--gold); border-color: var(--gold); color: #000; }
 
 /* ── FOOTER ── */
-.contact-info { text-align: center; font-size: 0.73rem; padding: 20px; color: var(--text-muted); line-height: 2; border-top: 1px solid var(--border); margin-top: 8px; }
+.contact-info { text-align: center; font-size: 0.92rem; padding: 20px; color: var(--text-muted); line-height: 2; border-top: 1px solid var(--border); margin-top: 8px; }
 .whatsapp-btn { background: transparent; color: white; }
 .phone-btn { background: transparent; color: white; }
     </style>
@@ -74,6 +81,10 @@ body { background-color: var(--bg); color: var(--text); font-family: 'Cairo', sa
         <h1>ICE N BEANS</h1>
         <p>ENJOY THE TASTE</p>
     </header>
+
+    <nav class="cat-nav-wrap">
+        <div class="cat-nav" id="cat-nav"></div>
+    </nav>
 
     <div class="container" id="menu-container">
         <section class="social-media" id="social-section">

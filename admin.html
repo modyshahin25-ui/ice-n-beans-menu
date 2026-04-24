@@ -87,8 +87,14 @@
     }
     .add-size-link:hover { text-decoration: underline; }
 
+    /* ===== ADMIN CAT NAV ===== */
+    .admin-cat-nav { display: flex; justify-content: center; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding: 12px 0 4px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin-bottom: 14px; }
+    .admin-cat-nav::-webkit-scrollbar { display: none; }
+    .admin-cat-btn { flex-shrink: 0; background: transparent; border: 1.5px solid #d1d5db; color: var(--muted); font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .admin-cat-btn:hover, .admin-cat-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
     /* ===== MENU LIST ===== */
-    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; padding: 6px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+    .section-label { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--text); text-transform: uppercase; padding: 6px 0 8px; border-bottom: 2px solid var(--border); margin-bottom: 10px; }
     .item-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
     .item-row:last-child { border-bottom: none; }
     .item-info { flex: 1; min-width: 0; }
@@ -189,6 +195,7 @@
     <!-- CURRENT MENU -->
     <div class="card">
       <div class="card-title">المنيو الحالية</div>
+      <div class="admin-cat-nav" id="adminCatNav"></div>
       <div id="itemsList"><div class="empty">جارٍ تحميل المنيو...</div></div>
     </div>
 

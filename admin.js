@@ -182,27 +182,54 @@ function resetForm() {
 // ============================================================
 //  Render menu list
 // ============================================================
+function slugify(str) {
+  return str.replace(/\s+/g, '-').replace(/[^\w\u0600-\u06FF-]/g, '');
+}
+
+function buildAdminCatNav(groupKeys) {
+  const nav = document.getElementById('adminCatNav');
+  nav.innerHTML = '';
+  groupKeys.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'admin-cat-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = cat;
+    btn.dataset.target = 'admin-cat-' + slugify(cat);
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.admin-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById(btn.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    nav.appendChild(btn);
+  });
+}
+
 function renderItems(data) {
   const cont = document.getElementById('itemsList');
   cont.innerHTML = '';
 
   if (!data || Object.keys(data).length === 0) {
     cont.innerHTML = '<div class="empty">لا توجد أصناف بعد</div>';
+    buildAdminCatNav([]);
     return;
   }
 
   const groups = {};
+  const groupOrder = [];
   Object.keys(data).forEach(key => {
     const item = data[key];
     const arKey = item.categoryAr || item.category || 'بدون قسم';
     const enKey = item.categoryEn || '';
     const cat = (enKey && !arKey.includes(enKey)) ? arKey + ' / ' + enKey : arKey;
-    if (!groups[cat]) groups[cat] = [];
+    if (!groups[cat]) { groups[cat] = []; groupOrder.push(cat); }
     groups[cat].push({ ...item, _key: key });
   });
 
-  for (let cat in groups) {
-    cont.innerHTML += `<div class="section-label">${cat}</div>`;
+  buildAdminCatNav(groupOrder);
+
+  for (let cat of groupOrder) {
+    const anchorId = 'admin-cat-' + slugify(cat);
+    cont.innerHTML += `<div class="section-label" id="${anchorId}">${cat}</div>`;
     groups[cat].forEach(item => {
       const itemSizes = item.sizes && item.sizes.length ? item.sizes : [
         { name: 'صغير / Small', price: item.small },
